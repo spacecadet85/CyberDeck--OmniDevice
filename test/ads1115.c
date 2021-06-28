@@ -1,138 +1,177 @@
-// asd1115.c read TMP37 temperature sensor ANC0
-// operates in continuous mode
-// pull up resistors in module caused problems
-// used level translator - operated ADS1115 at 5V
-// by Lewis Loflin lewis@bvu.net
-// www.bristolwatch.com
-// http://www.bristolwatch.com/rpi/ads1115.html
-
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/types.h> // open
+#include <sys/stat.h>  // open
+#include <fcntl.h>     // open
 #include <unistd.h>    // read/write usleep
-#include <stdlib.h>    // exit function
+#include <stdlib.h>    // exit
 #include <inttypes.h>  // uint8_t, etc
 #include <linux/i2c-dev.h> // I2C bus definitions
+#include "ads1115.h"
 
-// Connect ADDR to GRD.
-// Setup to use ADC0 single ended
 
-int fd;
-// Note PCF8591 defaults to 0x48!
-int asd_address = 0x48;
-int16_t val;
-uint8_t writeBuf[3];
-uint8_t readBuf[2];
-float myfloat;
-
-const float VPS = 4.096 / 32768.0; // volts per step
-
-/*
-The resolution of the ADC in single ended mode 
-we have 15 bit rather than 16 bit resolution, 
-the 16th bit being the sign of the differential 
-reading.
-*/
-
-int main() {
-
-  // open device on /dev/i2c-1 the default on Raspberry Pi B
-  if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
-    printf("Error: Couldn't open device! %d\n", fd);
-    exit (1);
-  }
-
-  // connect to ADS1115 as i2c slave
-  if (ioctl(fd, I2C_SLAVE, asd_address) < 0) {
-    printf("Error: Couldn't find device on address!\n");
-    exit (1);
-  }
-
-  // set config register and start conversion
-  // AIN0 and GND, 4.096v, 128s/s
-  // Refer to page 19 area of spec sheet
-  writeBuf[0] = 1; // config register is 1
-  writeBuf[1] = 0b11000010; // 0xC2 single shot off
-  // bit 15 flag bit for single shot not used here
-  // Bits 14-12 input selection:
-  // 100 ANC0; 101 ANC1; 110 ANC2; 111 ANC3
-  // Bits 11-9 Amp gain. Default to 010 here 001 P19
-  // Bit 8 Operational mode of the ADS1115.
-  // 0 : Continuous conversion mode
-  // 1 : Power-down single-shot mode (default)
-
-  writeBuf[2] = 0b10000101; // bits 7-0  0x85
-  // Bits 7-5 data rate default to 100 for 128SPS
-  // Bits 4-0  comparator functions see spec sheet.
-
-  // begin conversion
-  if (write(fd, writeBuf, 3) != 3) {
-    perror("Write to register 1");
-    exit (1);
-  }
-
-  sleep(1);
-
-  printf("ASD1115 Demo will take five readings.\n");
-
- 
-  // set pointer to 0
-  readBuf[0] = 0;
-  if (write(fd, readBuf, 1) != 1) {
-    perror("Write register select");
-    exit(-1);
-  }
-  
-  // take 5 readings:
-
-  int count = 1;
-
-  while (1)   {
-
-    // read conversion register
-    if (read(fd, readBuf, 2) != 2) {
-      perror("Read conversion");
-      exit(-1);
+//set up comms with ads1115
+void initialize(uint8_t address, int fd){
+    if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
+        printf("Error: Couldn't open device! %d\n", fd);
+        exit (1);
     }
 
-    // could also multiply by 256 then add readBuf[1]
-    val = readBuf[0] << 8 | readBuf[1];
+    // connect to ads1115 as i2c slave
+    if (ioctl(fd, I2C_SLAVE, address) < 0) {
+        printf("Error: Couldn't find device on address!\n");
+        exit (1);
+    }
+}
 
-    // with +- LSB sometimes generates very low neg number.
-    if (val < 0)   val = 0;
+/*might not need this function
+bool isConversionReady(int fd){
+    uint8_t readBuff[2];
+    do {
+        if (read(fd, writeBuf, 2) != 2) {
+        perror("Read conversion");
+        exit(-1);
+        }
+    }
+    while ((writeBuf[0] & 0x80) == 0);
+    return 
+}
+*/
 
-    myfloat = val * VPS; // convert to voltage
+uint8_t getMultiplexer(int fd){
+    uint16_t mux;
+    //read config 
+    mux = readReg(fd, ADS1115_RA_CONFIG);
+    //get multiplexer status
+    mux = mux >> (ADS1115_CFG_MUX_BIT - ADS1115_CFG_MUX_LENGTH + 1);
+    //shift bits, filter out OS bit and return (msB gets cut off)
+    mux = mux & 0b0111;
+    return val
+}
+//needs work
+void setMultiplexer(int fd, uint8_t mux){
+    uint16_t config;
+    uint8_t buff[3];
+    //get current config reg value for masking
+    config = readReg(fd, ADS1115_RA_CONFIG);
+    //mask bits
+    buff[0] = ADS1115_RA_CONFIG;
+    buff[1] = ((config >> 8) & 0xff);
+    buff[1] = buff[1] | ((mux << 4));// mux bits are 14, 13,and 12
+    buff[2] = ((config >> 0) & 0xff);//bits 7-0 
+    //write to multiplexer bits only
+    writeReg(fd, buff);
+}
+//needs work
+//sets the gain bits
+void setGain(int fd, uint8_t gain){
+    uint16_t config;
+    uint8_t buff[3];
+    //get current config
+    config = readReg(fd, ADS1115_RA_CONFIG);
+    //mask bits
+    buff[0] = ADS1115_RA_CONFIG;
+    buff[1] = ((config >> 8) & 0xff);
+    buff[1] = buff[1] | (gain << 1)
+    //write to gain bits
+}   
 
-    printf("Conversion number %d HEX 0x%02x DEC %d %4.3f volts.\n",
-           count, val, val, myfloat);
-    // TMP37 20mV per deg C
-    printf("Temp. C = %4.2f \n", myfloat / 0.02);
-    printf("Temp. F = %4.2f \n", myfloat / 0.02 * 9 / 5 + 32);
+//reads the gain bits
+void getGain(){
 
-    /* Output:
-     Conversion number 1 HEX 0x1113 DEC 4371 0.546 volts.
-     Temp. C = 27.32
-     Temp. F = 81.17
-     */
-     
-     sleep(5);
+}
 
-    count++; // inc count
-    if (count == 6)   break;
+bool getMode(){
 
-  } // end while loop
+}
 
-  // power down ASD1115
-  writeBuf[0] = 1;    // config register is 1
-  writeBuf[1] = 0b11000011; // bit 15-8 0xC3 single shot on
-  writeBuf[2] = 0b10000101; // bits 7-0  0x85
-  if (write(fd, writeBuf, 3) != 3) {
-    perror("Write to register 1");
-    exit (1);
-  }
+bool setMode(){
 
-  close(fd);
+}
 
-  return 0;
+uint8_t getRate(){
+
+}
+
+uint8_t setRate(){
+
+}
+
+bool getComparatorMode(){
+
+}
+
+void setComparatorMode(bool mode){
+
+}
+
+bool getComparatorPolarity(){
+
+}
+
+void setComparatorPolarity(bool polarity){
+
+}
+
+bool getComparatorLatchEnabled(){
+
+}
+
+void setComparatorLatchEnabled(bool enabled){
+
+}
+
+uint8_t getComparatorQueueMode(){
+
+}
+
+void setComparatorQueueMode(uint8_t mode){
+
+}
+
+void setConversionReadyPinMode(){
+
+}
+
+int16_t getLowThreshold(){
+
+}
+
+void setLowThreshold(int16_t threshold){
+
+}
+
+int16_t getHighThreshold(){
+
+}
+
+void setHighThreshold(int16_t threshold){
+
+}
+
+
+int writeReg(int fd, uint8_t inputBuf[3]){
+    if (write(fd, inputBuf, 3) != 3) {
+        perror("Write to register 1");
+        exit(-1);
+    }
+    return 1;
+}
+
+int16_t readReg(int fd, uint8_t regAddress){
+    uint8_t reg[2];
+    //send slave address byte (write), write to pointer reg
+    if (write(fd, regAddress, 1) != 1) {
+        perror("Write register select");
+        exit(-1);
+    }
+  
+    // send slave adress (read), read two bytes
+    if (read(fd, reg, 2) != 2) {
+        perror("Read conversion");
+        exit(-1);
+    }
+    
+    //convert dispaly results and return
+    int val = reg[0] << 8 | reg[1];
+    return val;
 }
