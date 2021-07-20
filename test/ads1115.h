@@ -93,11 +93,11 @@ void initialize(uint8_t address, int fd);
 bool testConnection();
 
 // SINGLE SHOT utilities
-bool pollConversion(uint16_t max_retries);
+bool pollConversion(int fd);
 void triggerConversion();
 
 // Read the current CONVERSION register
-int16_t getConversion(bool triggerAndPoll=true);
+int16_t getConversion(int fd);
 
 // Differential
 int16_t getConversionP0N1();
@@ -112,32 +112,32 @@ int16_t getConversionP2GND();
 int16_t getConversionP3GND();
 
 // Utility
-float getMilliVolts(bool triggerAndPoll=true);
+//float getMilliVolts(bool triggerAndPoll=true);
 float getMvPerCount();
 
 // CONFIG register
 bool isConversionReady();
 uint8_t getMultiplexer();
-void setMultiplexer(uint8_t mux);
-uint8_t getGain();
-void setGain(uint8_t gain);
-bool getMode();
-void setMode(bool mode);
-uint8_t getRate();
-void setRate(uint8_t rate);
+void setMultiplexer(int fd, uint8_t mux);
+uint8_t getGain(int fd);
+void setGain(int fd, uint8_t gain);
+bool getMode(int fd);
+void setMode(int fd, uint8_t mode);
+uint8_t getRate(int fd);
+void setRate(int fd, uint8_t rate);
 bool getComparatorMode();
-void setComparatorMode(bool mode);
+void setComparatorMode(int fd, uint8_t mode);
 bool getComparatorPolarity();
-void setComparatorPolarity(bool polarity);
+void setComparatorPolarity(int fd, uint8_t polarity);
 bool getComparatorLatchEnabled();
-void setComparatorLatchEnabled(bool enabled);
+void setComparatorLatchEnabled(int fd, uint8_t enabled);
 uint8_t getComparatorQueueMode();
-void setComparatorQueueMode(uint8_t mode);
+void setComparatorQueueMode(int fd, uint8_t mode);
 void setConversionReadyPinMode();
 
 // *_THRESH registers
 int16_t getLowThreshold();
-void setLowThreshold(int16_t threshold);
+void setLowThreshold(int fd, int16_t threshold);
 int16_t getHighThreshold();
 void setHighThreshold(int16_t threshold);
 

@@ -102,7 +102,7 @@ void setGain(int fd, uint8_t gain){
 }   
 
 //reads the gain bits
-void getGain(int fd){
+uint8_t getGain(int fd){
     uint16_t gain;
     //read config
     gain = readReg(fd, ADS1115_RA_CONFIG);
@@ -129,7 +129,7 @@ bool getMode(int fd){
     }
 }
 
-bool setMode(int fd, uint8_t mode){
+void setMode(int fd, uint8_t mode){
     uint16_t config;
     uint8_t buff[3];
     //get current config
@@ -154,7 +154,7 @@ uint8_t getRate(int fd){
     return rate;
 }
 
-uint8_t setRate(int fd, uint8_t rate){
+void setRate(int fd, uint8_t rate){
     uint16_t config;
     uint8_t buff[3];
     //get current config
