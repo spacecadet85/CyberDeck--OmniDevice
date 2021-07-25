@@ -11,7 +11,7 @@
 
 
 //set up comms with ads1115
-void initialize(int fd){
+void initialize(int fd, uint8_t address){
     if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
         printf("Error: Couldn't open device! %d\n", fd);
         exit (1);
@@ -134,18 +134,10 @@ void triggerConversion(int fd){
     uint8_t buff[3];
     trigg = readReg(fd, ADS1115_RA_CONFIG);
     buff[0] = ADS1115_RA_CONFIG;
-    buff[1] = ((trigg >> 8) & 0xff;
+    buff[1] = ((trigg >> 8)) & 0xff;
     buff[1] = buff[1] | (1 << 7);
     buff[2] = ((trigg >> 0) & 0xff);
     writeReg(fd, buff);
-}
-
-int16_t getConversion(int fd){
-    if(getMode(fd)){
-        triggerConversion(fd);
-        pollConversion(fd);
-    }
-    return readReg(fd, ADS1115_RA_CONVERSION);
 }
 
 uint8_t getMultiplexer(int fd){
@@ -156,7 +148,7 @@ uint8_t getMultiplexer(int fd){
     mux = mux >> (ADS1115_CFG_MUX_BIT - ADS1115_CFG_MUX_LENGTH + 1);
     //shift bits, filter out OS bit and return (msB gets cut off)
     mux = mux & 0b0111;
-    return val;
+    return mux;
 }
 //needs work
 void setMultiplexer(int fd, uint8_t mux){

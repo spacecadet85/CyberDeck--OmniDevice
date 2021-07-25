@@ -90,7 +90,7 @@
 //ADS1115();
 //ADS1115(uint8_t address);
 
-void initialize(int fd);
+void initialize(int fd, uint8_t address);
 bool testConnection();
 
 // SINGLE SHOT utilities
@@ -98,7 +98,7 @@ bool pollConversion(int fd);
 void triggerConversion(int fd);
 
 // Read the current CONVERSION register
-int16_t getConversion(int fd, uint8_t mux);
+int16_t getConversion(int fd);
 
 /*/ Differential
 int16_t getConversionP0N1(int fd);
