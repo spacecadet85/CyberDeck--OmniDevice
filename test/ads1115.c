@@ -7,6 +7,7 @@
 #include <stdlib.h>    // exit
 #include <inttypes.h>  // uint8_t, etc
 #include <linux/i2c-dev.h> // I2C bus definitions
+#include <sys/ioctl.h>
 #include "ads1115.h"
 
 
