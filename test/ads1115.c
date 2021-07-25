@@ -10,7 +10,7 @@
 
 
 //set up comms with ads1115
-void initialize(uint8_t address, int fd){
+void initialize(int fd){
     if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
         printf("Error: Couldn't open device! %d\n", fd);
         exit (1);
@@ -40,6 +40,93 @@ bool pollConversion(int fd){
     }
     return true;
 }
+/*/ Differential
+int16_t getConversionP0N1(int fd){
+    setMultiplexer(fd, ADS1115_MUX_P0_N1);
+    return getConversion(fd);
+}
+
+int16_t getConversionP0N3(int fd){
+    setMultiplexer(fd, ADS1115_MUX_P0_N3 );
+    return getConversion(fd);
+}
+
+int16_t getConversionP1N3(int fd){
+    setMultiplexer(fd, ADS1115_MUX_P1_N3);
+    return getConversion(fd);
+}
+
+int16_t getConversionP2N3(int fd){
+    setMultiplexer(fd, ADS1115_MUX_P2_N3);
+    return getConversion(fd);
+}
+
+// Single-ended
+int16_t getConversionP0GND(int fd){
+    setMultiplexer(fd,ADS1115_MUX_P0_NG);
+    return getConversion(fd);
+}
+
+int16_t getConversionP1GND(int fd){
+    setMultiplexer(fd,ADS1115_MUX_P1_NG);
+    return getConversion(fd);
+}
+
+int16_t getConversionP2GND(int fd){
+    setMultiplexer(fd,ADS1115_MUX_P2_NG);
+    return getConversion(fd);
+}
+
+int16_t getConversionP3GND(int fd){
+    setMultiplexer(fd,ADS1115_MUX_P3_NG);
+    return getConversion(fd);
+}
+*/
+int16_t getConversion(int fd){
+    //check to see if in singleshot mode
+    if(getMode(fd)){
+        //if so trigger conversion and poll
+        triggerConversion(fd);
+        pollConversion(fd);
+    }
+    //read when ready
+    return readReg(fd, ADS1115_RA_CONVERSION);
+}
+
+float getMilliVolts(int fd, uint16_t counts, uint8_t mux){
+    //set mux 
+    setMultiplexer(fd, mux);
+    //get pga
+    //get conversion and convert
+    uint8_t pga = getGain(fd);
+    switch (pga){
+        case ADS1115_PGA_6P144:
+            return (getConversion(fd) * ADS1115_MV_6P144); 
+            break;
+        case ADS1115_PGA_4P096:
+            return (getConversion(fd) * ADS1115_MV_4P096);
+            break;
+        case ADS1115_PGA_2P048:
+            return (getConversion(fd) * ADS1115_MV_2P048);
+            break;
+        case ADS1115_PGA_1P024:
+            return (getConversion(fd) * ADS1115_MV_1P024);
+            break;
+        case ADS1115_PGA_0P512:
+            return (getConversion(fd) * ADS1115_MV_0P512);
+            break;
+        case ADS1115_PGA_0P256:
+            return (getConversion(fd) * ADS1115_MV_0P256);
+            break;
+        case ADS1115_PGA_0P256B:
+            return (getConversion(fd) * ADS1115_MV_0P256B);
+            break;
+        case ADS1115_PGA_0P256C:
+            return (getConversion(fd) * ADS1115_MV_0P256C);
+            break;
+    }
+}
+//float getMvPerCount();
 
 void triggerConversion(int fd){
     uint16_t trigg;
@@ -281,7 +368,7 @@ void setComparatorQueueMode(int fd, uint8_t mode){
     //write to gain bits
     writeReg(fd, buff);
 }
-
+/*
 void beginConversion(int fd){
     uint16_t config;
     uint8_t buff[3];
@@ -294,6 +381,21 @@ void beginConversion(int fd){
     buff[1] = buff[1] | (1 << 8);
     //write to gain bits
     writeReg(fd, buff); 
+}
+*/
+
+void setConversionReadyPinMode(int fd, uint8_t pinMode){
+    uint16_t config;
+    uint8_t buff[3];
+    //get current config
+    config = readReg(fd, ADS1115_RA_CONFIG);
+    //mask bits
+    buff[0] = ADS1115_RA_CONFIG;
+    buff[1] = ((config >> 8) & 0xff);
+    buff[2] = ((config >> 0) & 0xff);
+    buff[2] = buff[2] | (mode << 0);
+    //write to gain bits
+    writeReg(fd, buff);
 }
 
 int16_t getLowThreshold(){
@@ -320,12 +422,12 @@ void setHighThreshold(int16_t threshold){
 }
 
 
-int writeReg(int fd, uint8_t inputBuf[3]){
+void writeReg(int fd, uint8_t inputBuf[3]){
     if (write(fd, inputBuf, 3) != 3) {
         perror("Write to register 1");
         exit(-1);
     }
-    return 1;
+    return;
 }
 
 
