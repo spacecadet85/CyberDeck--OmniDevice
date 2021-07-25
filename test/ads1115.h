@@ -95,10 +95,17 @@ bool testConnection();
 
 // SINGLE SHOT utilities
 bool pollConversion(int fd);
+<<<<<<< HEAD
 void triggerConversion(int fd);
 
 // Read the current CONVERSION register
 int16_t getConversion(int fd, uint8_t mux);
+=======
+void triggerConversion();
+
+// Read the current CONVERSION register
+int16_t getConversion(int fd);
+>>>>>>> 85aa7b4b0e597202d3d4a9837a5fbfac10993be3
 
 /*/ Differential
 int16_t getConversionP0N1(int fd);
@@ -116,12 +123,21 @@ int16_t getConversionP3GND(int fd);
 
 
 // Utility
+<<<<<<< HEAD
 float getMilliVolts(bool triggerAndPoll=true);
 //float getMvPerCount();
 
 // CONFIG register
 bool isConversionReady(int fd);
 uint8_t getMultiplexer(int fd);
+=======
+//float getMilliVolts(bool triggerAndPoll=true);
+float getMvPerCount();
+
+// CONFIG register
+bool isConversionReady();
+uint8_t getMultiplexer();
+>>>>>>> 85aa7b4b0e597202d3d4a9837a5fbfac10993be3
 void setMultiplexer(int fd, uint8_t mux);
 uint8_t getGain(int fd);
 void setGain(int fd, uint8_t gain);
@@ -129,6 +145,7 @@ bool getMode(int fd);
 void setMode(int fd, uint8_t mode);
 uint8_t getRate(int fd);
 void setRate(int fd, uint8_t rate);
+<<<<<<< HEAD
 bool getComparatorMode(int fd);
 void setComparatorMode(int fd, uint8_t mode);
 bool getComparatorPolarity(int fd);
@@ -138,10 +155,21 @@ void setComparatorLatchEnabled(int fd, uint8_t enabled);
 uint8_t getComparatorQueueMode(int fd);
 void setComparatorQueueMode(int fd, uint8_t mode);
 void setConversionReadyPinMode(int fd, );
+=======
+bool getComparatorMode();
+void setComparatorMode(int fd, uint8_t mode);
+bool getComparatorPolarity();
+void setComparatorPolarity(int fd, uint8_t polarity);
+bool getComparatorLatchEnabled();
+void setComparatorLatchEnabled(int fd, uint8_t enabled);
+uint8_t getComparatorQueueMode();
+void setComparatorQueueMode(int fd, uint8_t mode);
+void setConversionReadyPinMode();
+>>>>>>> 85aa7b4b0e597202d3d4a9837a5fbfac10993be3
 
 // *_THRESH registers
 int16_t getLowThreshold();
-void setLowThreshold(int16_t threshold);
+void setLowThreshold(int fd, int16_t threshold);
 int16_t getHighThreshold();
 void setHighThreshold(int16_t threshold);
 
