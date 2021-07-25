@@ -2,6 +2,7 @@
 #define ADS1115_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define ADS1115_ADDRESS_ADDR_GND    0x48 // address pin low (GND)
 #define ADS1115_ADDRESS_ADDR_VDD    0x49 // address pin high (VCC)
