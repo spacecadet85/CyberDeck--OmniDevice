@@ -31,8 +31,8 @@ bool isConversionReady(int fd){
     //get status bit
     osBit = osBit >> ADS1115_CFG_OS_BIT;
     return osBit;
-    
 }
+
 //if the ad chip fails this will hang
 bool pollConversion(int fd){
     bool conversion = false;
@@ -94,7 +94,7 @@ int16_t getConversion(int fd){
     return readReg(fd, ADS1115_RA_CONVERSION);
 }
 
-float getMilliVolts(int fd, uint16_t counts, uint8_t mux){
+float getMilliVolts(int fd, uint8_t mux){
     //set mux 
     setMultiplexer(fd, mux);
     //get pga

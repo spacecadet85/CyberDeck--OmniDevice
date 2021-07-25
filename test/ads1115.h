@@ -116,7 +116,7 @@ int16_t getConversionP3GND(int fd);
 
 
 // Utility
-float getMilliVolts(bool triggerAndPoll=true);
+float getMilliVolts(int fd, uint8_t mux);
 //float getMvPerCount();
 
 // CONFIG register
@@ -137,7 +137,7 @@ bool getComparatorLatchEnabled(int fd);
 void setComparatorLatchEnabled(int fd, uint8_t enabled);
 uint8_t getComparatorQueueMode(int fd);
 void setComparatorQueueMode(int fd, uint8_t mode);
-void setConversionReadyPinMode(int fd, );
+void setConversionReadyPinMode(int fd, uint8_t pinMode);
 
 
 // *_THRESH registers
@@ -150,7 +150,7 @@ void setHighThreshold(int16_t threshold);
 void showConfigRegister();
 
 void writeReg(int fd, uint8_t inputBuf[3]);
-int16_t readReg(int fd, uint8_t regAddress):
+int16_t readReg(int fd, uint8_t regAddress);
 
 
 #endif
