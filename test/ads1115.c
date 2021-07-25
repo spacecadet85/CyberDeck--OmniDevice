@@ -241,7 +241,7 @@ void setRate(int fd, uint8_t rate){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
-    buff[1] = buff[1] | (mode << 0);
+    buff[1] = buff[1] | (rate << 0);
     buff[2] = ((config >>0) & 0xff);
     //write to gain bits
     writeReg(fd, buff);
@@ -386,7 +386,7 @@ void setConversionReadyPinMode(int fd, uint8_t pinMode){
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
     buff[2] = ((config >> 0) & 0xff);
-    buff[2] = buff[2] | (mode << 0);
+    buff[2] = buff[2] | (pinMode << 0);
     //write to gain bits
     writeReg(fd, buff);
 }
@@ -402,6 +402,7 @@ void setLowThreshold(int fd, int16_t threshold){
 
 }
 
+/*
 int16_t getHighThreshold(){
     uint16_t highTheshold;
 
@@ -413,7 +414,7 @@ int16_t getHighThreshold(){
 void setHighThreshold(int16_t threshold){
 
 }
-
+*/
 
 void writeReg(int fd, uint8_t inputBuf[3]){
     if (write(fd, inputBuf, 3) != 3) {
