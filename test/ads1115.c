@@ -390,7 +390,7 @@ void setConversionReadyPinMode(int fd, uint8_t pinMode){
     //write to gain bits
     writeReg(fd, buff);
 }
-
+/*
 int16_t getLowThreshold(){
     int16_t lowTheshold;
     //read config
@@ -402,7 +402,7 @@ void setLowThreshold(int fd, int16_t threshold){
 
 }
 
-/*
+
 int16_t getHighThreshold(){
     uint16_t highTheshold;
 
