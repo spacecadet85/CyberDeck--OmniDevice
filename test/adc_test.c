@@ -18,6 +18,8 @@ int main(){
     int fd;
     initialize_ads1115(fd, ADS1115_ADDRESS_ADDR_GND);
     //check read
+    int mux = getMultiplexer(fd);
+    printf("mux value is %x",mux);
     //check write 
     //check all functions
 }
