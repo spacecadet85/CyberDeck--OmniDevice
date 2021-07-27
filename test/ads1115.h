@@ -91,7 +91,7 @@
 //ADS1115();
 //ADS1115(uint8_t address);
 
-void initialize_ads1115(int fd, uint8_t address);
+void initialize_ads1115(int fd, int *address);
 bool testConnection();
 
 // SINGLE SHOT utilities
