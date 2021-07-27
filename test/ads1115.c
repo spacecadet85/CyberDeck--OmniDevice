@@ -19,7 +19,7 @@ void initialize_ads1115(int fd, int address){
     }
 
     // connect to ads1115 as i2c slave
-    if (ioctl(fd, I2C_SLAVE, (void *) address) < 0) {
+    if (ioctl(fd, I2C_SLAVE, address) < 0) {
         printf("Error: Couldn't find device on address!\n");
         exit (1);
     }
@@ -142,7 +142,7 @@ void triggerConversion(int fd){
 }
 
 uint8_t getMultiplexer(int fd){
-    uint16_t mux;
+    int16_t mux;
     //read config 
     mux = readReg(fd, ADS1115_RA_CONFIG);
     //get multiplexer status
@@ -430,7 +430,7 @@ int16_t readReg(int fd, uint8_t regAddress){
     uint8_t reg[2];
     reg[0] = regAddress;
     //send slave address byte (write), write to pointer reg
-    if (write(fd, reg, 1) != 1) {
+    if (write(fd, readReg, 1) != 1) {
         perror("Write register select");
         exit(-1);
     }
