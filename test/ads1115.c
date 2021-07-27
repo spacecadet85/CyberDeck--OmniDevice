@@ -12,14 +12,14 @@
 
 
 //set up comms with ads1115
-void initialize_ads1115(int fd, int *address){
+void initialize_ads1115(int fd, int address){
     if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
         printf("Error: Couldn't open device! %d\n", fd);
         exit (1);
     }
 
     // connect to ads1115 as i2c slave
-    if (ioctl(fd, I2C_SLAVE, address) < 0) {
+    if (ioctl(fd, I2C_SLAVE, (void *) address) < 0) {
         printf("Error: Couldn't find device on address!\n");
         exit (1);
     }
@@ -428,8 +428,9 @@ void writeReg(int fd, uint8_t inputBuf[3]){
 
 int16_t readReg(int fd, uint8_t regAddress){
     uint8_t reg[2];
+    reg[0] = regAddress;
     //send slave address byte (write), write to pointer reg
-    if (write(fd, regAddress, 1) != 1) {
+    if (write(fd, reg, 1) != 1) {
         perror("Write register select");
         exit(-1);
     }
@@ -441,6 +442,5 @@ int16_t readReg(int fd, uint8_t regAddress){
     }
     
     //convert dispaly results and return
-    int val = reg[0] << 8 | reg[1];
-    return val;
+    return (reg[0] << 8 | reg[1]);
 }
