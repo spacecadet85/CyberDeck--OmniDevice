@@ -430,7 +430,7 @@ int16_t readReg(int fd, uint8_t regAddress){
     uint8_t reg[2];
     reg[0] = regAddress;
     //send slave address byte (write), write to pointer reg
-    if (write(fd, readReg, 1) != 1) {
+    if (write(fd, reg, 1) != 1) {
         perror("Write register select");
         exit(-1);
     }
