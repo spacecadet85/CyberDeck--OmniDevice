@@ -16,10 +16,11 @@ This code will test the functionality of the ads1115.c and .h files.
 int main(){
     //set up 
     int fd;
-    initialize_ads1115(fd, ADS1115_ADDRESS_ADDR_GND);
+    initialize_acd ds1115(fd, ADS1115_ADDRESS_ADDR_GND);
     //check read
     int mux = getMultiplexer(fd);
     printf("mux value is %x",mux);
     //check write 
     //check all functions
+    return(0);
 }
