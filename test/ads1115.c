@@ -438,7 +438,7 @@ int16_t readReg(int fd, uint8_t regAddress){
     // send slave adress (read), read two bytes
     if (read(fd, reg, 2) != 2) {
         perror("Read conversion");
-        exit(-1);
+        exit(-1);qb19
     }
     
     //convert dispaly results and return
