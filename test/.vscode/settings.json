@@ -2,6 +2,8 @@
     "files.associations": {
         "stat.h": "c",
         "fcntl.h": "c",
-        "i2c-dev.h": "c"
+        "i2c-dev.h": "c",
+        "stdio.h": "c",
+        "types.h": "c"
     }
 }
