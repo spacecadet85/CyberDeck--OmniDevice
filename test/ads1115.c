@@ -12,7 +12,8 @@
 
 
 //set up comms with ads1115
-void initialize_ads1115(int fd, int address){
+void initialize_ads1115(int address){
+    int fd
     if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
         printf("Error: Couldn't open device! %d\n", fd);
         exit (1);
@@ -23,6 +24,7 @@ void initialize_ads1115(int fd, int address){
         printf("Error: Couldn't find device on address!\n");
         exit (1);
     }
+    return(fd);
 }
 
 bool isConversionReady(int fd){
