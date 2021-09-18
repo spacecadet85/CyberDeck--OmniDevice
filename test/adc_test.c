@@ -16,9 +16,16 @@ This code will test the functionality of the ads1115.c and .h files.
 int main(){
     //set up 
     int fd = initialize_ads1115(ADS1115_ADDRESS_ADDR_GND);
+    //set and check mode
+    if (getmode(fd)){
+        printf("Power down single shot mode\n");
+    }
+    else {
+        printf("Continuous conversion mode\n");
+    }
     //check read
     int mux = getMultiplexer(fd);
-    printf("mux value is %x",mux);
+    printf("mux value is %x\n",mux);
     //check write 
     //check all functions
     return(0);
