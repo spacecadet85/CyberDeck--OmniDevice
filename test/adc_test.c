@@ -32,7 +32,7 @@ int main(){
         printf("Continuous conversion mode\n");
     }
     mode = 1;
-    setMode(fd, 1);
+    setMode(fd, mode);
     if (getMode(fd)){
         printf("Power down single shot mode\n");
     }

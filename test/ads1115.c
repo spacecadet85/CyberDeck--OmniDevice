@@ -219,6 +219,12 @@ void setMode(int fd, uint8_t mode){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
+    if(mode == 1){
+        buff[1] = buff[1] | (mode << 0);
+    }
+    else {
+        buff[1] = buff[1] & (mode << 0);
+    }
     buff[1] = buff[1] | (mode << 0);
     buff[2] = ((config >>0) & 0xff);
     //write to gain bits
@@ -420,7 +426,11 @@ void setHighThreshold(int16_t threshold){
 */
 
 void writeReg(int fd, uint8_t inputBuf[3]){
-    if (write(fd, inputBuf, 3) != 3) {
+uint8_t buff[3];
+buff[0] = inputBuf[0];
+buff[1] = inputBuf[1];
+buff[2] = inputBuf[2];
+    if (write(fd, buff, 3) != 3) {
         perror("Write to register 1");
         exit(-1);
     }
