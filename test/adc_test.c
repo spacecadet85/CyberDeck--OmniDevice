@@ -17,7 +17,23 @@ int main(){
     //set up 
     int fd = initialize_ads1115(ADS1115_ADDRESS_ADDR_GND);
     //set and check mode
-    if (getmode(fd)){
+    int mode = 0;
+    if (getMode(fd)){
+        printf("Power down single shot mode\n");
+    }
+    else {
+        printf("Continuous conversion mode\n");
+    }
+    setMode(fd, mode);
+    if (getMode(fd)){
+        printf("Power down single shot mode\n");
+    }
+    else {
+        printf("Continuous conversion mode\n");
+    }
+    mode = 1;
+    setMode(fd, 1);
+    if (getMode(fd)){
         printf("Power down single shot mode\n");
     }
     else {
