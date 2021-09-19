@@ -250,7 +250,9 @@ void setRate(int fd, uint8_t rate){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
-    buff[1] = buff[1] | (rate << 0);
+    //zero out value and set
+    buff[1] = buff[1] & ~(111 << 5);
+    buff[1] = buff[1] | (rate << 5);
     buff[2] = ((config >>0) & 0xff);
     //write to gain bits
     writeReg(fd, buff);
