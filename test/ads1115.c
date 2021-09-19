@@ -153,7 +153,6 @@ uint8_t getMultiplexer(int fd){
     mux = mux & 0b0111;
     return mux;
 }
-//needs work
 void setMultiplexer(int fd, uint8_t mux){
     uint16_t config;
     uint8_t buff[3];
@@ -162,12 +161,12 @@ void setMultiplexer(int fd, uint8_t mux){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
-    buff[1] = buff[1] | (mux << 4);// mux bits are 14, 13,and 12
+    buff[1] = buff[1] & ~(111 << 4);
+    buff[1] = buff[1] | (mux << 4);
     buff[2] = ((config >> 0) & 0xff);//bits 7-0 
     //write to multiplexer bits only
     writeReg(fd, buff);
 }
-//needs work
 //sets the gain bits
 void setGain(int fd, uint8_t gain){
     uint16_t config;
@@ -177,6 +176,7 @@ void setGain(int fd, uint8_t gain){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
+    buff[1] = buff[1] & ~(111 << 1);
     buff[1] = buff[1] | (gain << 1);
     buff[2] = ((config >>0) & 0xff);
     //write to gain bits
@@ -250,10 +250,10 @@ void setRate(int fd, uint8_t rate){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
-    //zero out value and set
-    buff[1] = buff[1] & ~(111 << 5);
-    buff[1] = buff[1] | (rate << 5);
     buff[2] = ((config >>0) & 0xff);
+    //zero out value and set
+    buff[2] = buff[2] & ~(111 << 5);
+    buff[2] = buff[2] | (rate << 5);
     //write to gain bits
     writeReg(fd, buff);
 }
@@ -282,8 +282,9 @@ void setComparatorMode(int fd, uint8_t mode){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
-    buff[1] = buff[1] | (mode << 0);
     buff[2] = ((config >>0) & 0xff);
+    buff[2] = buff[2] & ~(1 << 4);
+    buff[2] = buff[2] | (mode << 4);
     //write to gain bits
     writeReg(fd, buff);
 }
@@ -313,6 +314,7 @@ void setComparatorPolarity(int fd, uint8_t polarity){
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
     buff[2] = ((config >> 0) & 0xff);
+    buff[2] = buff[2] & ~(1 << 3);
     buff[2] = buff[2] | (polarity << 3);
     //write to gain bits
     writeReg(fd, buff);
@@ -343,7 +345,8 @@ void setComparatorLatchEnabled(int fd, uint8_t enabled){
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
     buff[2] = ((config >> 0) & 0xff);
-    buff[2] = buff[2] | (enabled << 3);
+    buff[2] = buff[2] & ~(1 << 2);
+    buff[2] = buff[2] | (enabled << 2);
     //write to gain bits
     writeReg(fd, buff);
 }
@@ -368,6 +371,7 @@ void setComparatorQueueMode(int fd, uint8_t mode){
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
     buff[2] = ((config >> 0) & 0xff);
+    buff[2] = buff[2] & ~(11 << 0);
     buff[2] = buff[2] | (mode << 0);
     //write to gain bits
     writeReg(fd, buff);
@@ -387,7 +391,7 @@ void beginConversion(int fd){
     writeReg(fd, buff); 
 }
 */
-
+/*
 void setConversionReadyPinMode(int fd, uint8_t pinMode){
     uint16_t config;
     uint8_t buff[3];
@@ -401,6 +405,7 @@ void setConversionReadyPinMode(int fd, uint8_t pinMode){
     //write to gain bits
     writeReg(fd, buff);
 }
+*/
 /*
 int16_t getLowThreshold(){
     int16_t lowTheshold;
