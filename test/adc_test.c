@@ -39,6 +39,80 @@ int main(){
     else {
         printf("Continuous conversion mode\n");
     }
+
+    int mux = getMultiplexer(fd);
+    int setMux = ADS1115_MUX_P0_N3;
+
+    printf("mux value = %i\n", mux);
+    setMultiplexer(fd, setMux);
+    int mux = getMultiplexer(fd);
+    if(mux == ADS1115_MUX_P0_N3){
+        printf("Mux was set correctly --> %i\n", mux);
+    }
+    else{
+        printf("Mux was not set correctly --> %i", mux);
+    }
+
+    setMux = ADS1115_MUX_P1_N3;
+    setMultiplexer(fd, setMux);
+    mux = getMultiplexer(fd);
+    if(mux == ADS1115_MUX_P1_N3){
+        printf("Mux was set correctly --> %i\n", mux);
+    }
+    else{
+        printf("Mux was not set correctly --> %i", mux);
+    }
+
+    setMux = ADS1115_MUX_P2_N3;
+    setMultiplexer(fd, setMux);
+    mux = getMultiplexer(fd);
+    if(mux == ADS1115_MUX_P2_N3){
+        printf("Mux was set correctly --> %i\n", mux);
+    }
+    else{
+        printf("Mux was not set correctly --> %i", mux);
+    }
+
+    setMux = ADS1115_MUX_P0_NG;
+    setMultiplexer(fd, setMux);
+    mux = getMultiplexer(fd);
+    if(mux == ADS1115_MUX_P0_NG){
+        printf("Mux was set correctly --> %i\n", mux);
+    }
+    else{
+        printf("Mux was not set correctly --> %i", mux);
+    }
+
+    setMux = ADS1115_MUX_P1_NG;
+    setMultiplexer(fd, setMux);
+    mux = getMultiplexer(fd);
+    if(mux == ADS1115_MUX_P1_NG){
+        printf("Mux was set correctly --> %i\n", mux);
+    }
+    else{
+        printf("Mux was not set correctly --> %i", mux);
+    }
+
+    setMux = ADS1115_MUX_P2_NG;
+    setMultiplexer(fd, setMux);
+    mux = getMultiplexer(fd);
+    if(mux == ADS1115_MUX_P2_NG){
+        printf("Mux was set correctly --> %i\n", mux);
+    }
+    else{
+        printf("Mux was not set correctly --> %i", mux);
+    }
+
+    setMux = ADS1115_MUX_P3_NG;
+    setMultiplexer(fd, setMux);
+    mux = getMultiplexer(fd);
+    if(mux == ADS1115_MUX_P3_NG){
+        printf("Mux was set correctly --> %i\n", mux);
+    }
+    else{
+        printf("Mux was not set correctly --> %i", mux);
+    }
+    
     //check read
     int mux = getMultiplexer(fd);
     printf("mux value is %x\n",mux);
