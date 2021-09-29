@@ -117,7 +117,7 @@ int main(){
     int gain = getGain(fd);
     printf("Default Gain ---> %i\n", gain);
 
-    for(int i = 0, i > 7 , i++){
+    for(int i = 0; i <= 7; i++){
         setGain(fd, i);
         int gain = getGain(fd);
         if(gain == i){
