@@ -45,7 +45,7 @@ int main(){
 
     printf("mux value = %i\n", mux);
     setMultiplexer(fd, setMux);
-    int mux = getMultiplexer(fd);
+    mux = getMultiplexer(fd);
     if(mux == ADS1115_MUX_P0_N3){
         printf("Mux was set correctly --> %i\n", mux);
     }
@@ -113,9 +113,7 @@ int main(){
         printf("Mux was not set correctly --> %i", mux);
     }
     
-    //check read
-    int mux = getMultiplexer(fd);
-    printf("mux value is %x\n",mux);
+    
     //check write 
     //check all functions
     return(0);
