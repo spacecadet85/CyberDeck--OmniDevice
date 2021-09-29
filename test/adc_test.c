@@ -113,8 +113,21 @@ int main(){
         printf("Mux was not set correctly --> %i", mux);
     }
     
-    
-    //check write 
-    //check all functions
+    //gain test
+    int gain = getGain(fd);
+    printf("Default Gain ---> %i\n", gain);
+
+    for(int i = 0, i > 7 , i++){
+        setGain(fd, i);
+        int gain = getGain(fd);
+        if(gain == i){
+            printf("Gain was set correctly --> %i\n", gain);
+        }
+        else{
+            printf("Gain was not set correctly --> %i\n", gain);
+        }
+
+    }
+
     return(0);
 }
