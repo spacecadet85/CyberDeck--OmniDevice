@@ -117,7 +117,7 @@ int main(){
     int gain = getGain(fd);
     printf("Default Gain ---> %i\n", gain);
 
-    for(int i = 0, i > 7 , i++){
+    for(int i = 0; i <= 7; i++){
         setGain(fd, i);
         int gain = getGain(fd);
         if(gain == i){
@@ -125,6 +125,22 @@ int main(){
         }
         else{
             printf("Gain was not set correctly --> %i\n", gain);
+        }
+
+    }
+
+    //test rate
+    int rate = getRate(fd);
+    printf("Default Rate ---> %i\n", rate);
+
+    for(int i = 0; i < 7=; i++){
+        setRate(fd, i);
+        int rate = getRate(fd);
+        if(rate == i){
+            printf("Rate was set correctly --> %i\n", rate);
+        }
+        else{
+            printf("Rate was not set correctly --> %i\n", rate);
         }
 
     }
