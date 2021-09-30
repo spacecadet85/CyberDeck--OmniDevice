@@ -133,7 +133,7 @@ int main(){
     int rate = getRate(fd);
     printf("Default Rate ---> %i\n", rate);
 
-    for(int i = 0; i < 7=; i++){
+    for(int i = 0; i <= 7; i++){
         setRate(fd, i);
         int rate = getRate(fd);
         if(rate == i){
