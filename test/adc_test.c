@@ -147,7 +147,7 @@ int main(){
 
     //comparator mode
     int compMode = getComparatorMode(fd);
-    printf("Default comparator mode ---> %i\n", rate);
+    printf("Default comparator mode ---> %i\n", compMode);
     if(compMode == 0){
         compMode = 1;
     }
