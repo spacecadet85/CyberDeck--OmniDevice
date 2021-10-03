@@ -157,4 +157,32 @@ int main(){
     setComparatorMode(fd, compMode);
     compMode = getComparatorMode(fd);
     printf("Comparator set to ---> %i\n", compMode);
+
+    //comparator polarity
+    int polMode = getComparatorPolarity(fd);
+    printf("Default comparator polarity mode ---> %i\n", polMode);
+    if(polMode == 0){
+        polMode = 1;
+    }
+    else{
+        polMode = 0;
+    }
+    setComparatorPolarity(fd, polMode);
+    polMode = getComparatorPolarity(fd);
+    printf("Comparator polarity set to ---> %i\n", polMode);
+
+    //comparator latch enable
+    int latchMode = getComparatorLatchEnabled(fd);
+    printf("Default comparator latch mode ---> %i\n", latchMode);
+    if(latchMode == 0){
+        latchMode = 1;
+    }
+    else{
+        latchMode = 0;
+    }
+    setComparatorLatchEnabled(fd, latchMode);
+    latchMode = getComparatorLatchEnabled(fd);
+    printf("Comparator latch set to ---> %i\n", latchMode);
+
+    return 0;
 }
