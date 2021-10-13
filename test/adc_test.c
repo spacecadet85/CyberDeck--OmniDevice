@@ -184,5 +184,42 @@ int main(){
     latchMode = getComparatorLatchEnabled(fd);
     printf("Comparator latch set to ---> %i\n", latchMode);
 
+    //resistor divider = 0.175
+    int dividerGain = 1/0.175; 
+    float milvotls = 0;
+    float milvolts1 = 0;
+    setComparatorMode(fd, ADS1115_COMP_MODE_HYSTERESIS);
+    setComparatorLatchEnabled(fd, ADS1115_COMP_LAT_NON_LATCHING);
+    setComparatorQueueMode(fd, ADS1115_COMP_QUE_DISABLE);
+    //set rate
+    setRate(fd, ADS1115_RATE_128);
+    //set mode single shot
+    setMode(fd, ADS1115_MODE_SINGLESHOT);
+    //set gain to 1
+    setGain(fd, ADS1115_PGA_4P096);
+    //set rate
+    setRate(fd, ADS1115_RATE_128);
+    //setup mux P0-N1
+    //get A0-A1
+    //print
+    milvolts = getMilliVolts(fd, ADS1115_MUX_P0_N1);
+    milvotls = milvolts * dividerGain;
+    printf("differential battery value ---> %f\n", milvotls);
+    //setup mux P1-GND
+    //get A1-GND
+    milvolts = getMilliVolts(fd, ADS1115_MUX_P1_NG);
+    milvotls1 = milvolts * dividerGain;
+    milvolts 
+    printf("differential battery value ---> %f\n", milvotls);
+    //set mux
+    //get float of A0
+    milvolts = getMilliVolts(fd, ADS1115_MUX_P0_NG);
+    milvotls = milvolts * dividerGain;
+    printf("differential battery value ---> %f\n", milvotls);
+
+    milvolts = milvolts1 - milvotls;
+    printf("A1-A0 ---> %f", milvotls);
+    
+
     return 0;
 }
