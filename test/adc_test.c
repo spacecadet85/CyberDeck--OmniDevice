@@ -217,7 +217,7 @@ int main(){
     printf("differential battery value ---> %f\n", milvolts);
 
     milvolts = milvolts1 - milvolts;
-    printf("A1-A0 ---> %f", milvolts);
+    printf("A1-A0 ---> %f\n", milvolts);
     
 
     return 0;
