@@ -184,8 +184,8 @@ int main(){
     latchMode = getComparatorLatchEnabled(fd);
     printf("Comparator latch set to ---> %i\n", latchMode);
 
-    //resistor divider = 0.175
-    int dividerGain = 1/0.175; 
+    //resistor divider = 2.185k/(9.94k + 2.185k)=0.180 
+    float dividerGain = 1/0.180; 
     float milvolts = 0;
     float milvolts1 = 0;
     setComparatorMode(fd, ADS1115_COMP_MODE_HYSTERESIS);
@@ -203,7 +203,9 @@ int main(){
     //get A0-A1
     //print
     milvolts = getMilliVolts(fd, ADS1115_MUX_P0_N1);
-    milvolts = milvolts * dividerGain;
+    milvolts = milvolts / 1000;
+    printf("A1-A0 ---> %f\n", milvolts);
+    milvolts = milvolts * dividerGain * -1;
     printf("differential battery value ---> %f\n", milvolts);
     //setup mux P1-GND
     //get A1-GND
