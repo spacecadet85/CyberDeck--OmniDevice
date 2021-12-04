@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include <sys/types.h> // open
 #include <sys/stat.h>  // open
 #include <fcntl.h>     // open
@@ -7,13 +6,11 @@
 #include <stdlib.h>    // exit
 #include <inttypes.h>  // uint8_t, etc
 #include <linux/i2c-dev.h> // I2C bus definitions
-#include <sys/ioctl.h>
 #include "ads1115.h"
 
 
 //set up comms with ads1115
-int initialize_ads1115(int address){
-    int fd;
+void initialize(int fd){
     if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
         printf("Error: Couldn't open device! %d\n", fd);
         exit (1);
@@ -24,7 +21,6 @@ int initialize_ads1115(int address){
         printf("Error: Couldn't find device on address!\n");
         exit (1);
     }
-    return(fd);
 }
 
 bool isConversionReady(int fd){
@@ -34,8 +30,8 @@ bool isConversionReady(int fd){
     //get status bit
     osBit = osBit >> ADS1115_CFG_OS_BIT;
     return osBit;
+    
 }
-
 //if the ad chip fails this will hang
 bool pollConversion(int fd){
     bool conversion = false;
@@ -44,115 +40,37 @@ bool pollConversion(int fd){
     }
     return true;
 }
-/*/ Differential
-int16_t getConversionP0N1(int fd){
-    setMultiplexer(fd, ADS1115_MUX_P0_N1);
-    return getConversion(fd);
-}
-
-int16_t getConversionP0N3(int fd){
-    setMultiplexer(fd, ADS1115_MUX_P0_N3 );
-    return getConversion(fd);
-}
-
-int16_t getConversionP1N3(int fd){
-    setMultiplexer(fd, ADS1115_MUX_P1_N3);
-    return getConversion(fd);
-}
-
-int16_t getConversionP2N3(int fd){
-    setMultiplexer(fd, ADS1115_MUX_P2_N3);
-    return getConversion(fd);
-}
-
-// Single-ended
-int16_t getConversionP0GND(int fd){
-    setMultiplexer(fd,ADS1115_MUX_P0_NG);
-    return getConversion(fd);
-}
-
-int16_t getConversionP1GND(int fd){
-    setMultiplexer(fd,ADS1115_MUX_P1_NG);
-    return getConversion(fd);
-}
-
-int16_t getConversionP2GND(int fd){
-    setMultiplexer(fd,ADS1115_MUX_P2_NG);
-    return getConversion(fd);
-}
-
-int16_t getConversionP3GND(int fd){
-    setMultiplexer(fd,ADS1115_MUX_P3_NG);
-    return getConversion(fd);
-}
-*/
-int16_t getConversion(int fd){
-    //check to see if in singleshot mode
-    if(getMode(fd)){
-        //if so trigger conversion and poll
-        triggerConversion(fd);
-        pollConversion(fd);
-    }
-    //read when ready
-    return readReg(fd, ADS1115_RA_CONVERSION);
-}
-
-float getMilliVolts(int fd, uint8_t mux){
-    //set mux 
-    setMultiplexer(fd, mux);
-    //get pga
-    //get conversion and convert
-    uint8_t pga = getGain(fd);
-    switch (pga){
-        case ADS1115_PGA_6P144:
-            return (getConversion(fd) * ADS1115_MV_6P144); 
-            break;
-        case ADS1115_PGA_4P096:
-            return (getConversion(fd) * ADS1115_MV_4P096);
-            break;
-        case ADS1115_PGA_2P048:
-            return (getConversion(fd) * ADS1115_MV_2P048);
-            break;
-        case ADS1115_PGA_1P024:
-            return (getConversion(fd) * ADS1115_MV_1P024);
-            break;
-        case ADS1115_PGA_0P512:
-            return (getConversion(fd) * ADS1115_MV_0P512);
-            break;
-        case ADS1115_PGA_0P256:
-            return (getConversion(fd) * ADS1115_MV_0P256);
-            break;
-        case ADS1115_PGA_0P256B:
-            return (getConversion(fd) * ADS1115_MV_0P256B);
-            break;
-        case ADS1115_PGA_0P256C:
-            return (getConversion(fd) * ADS1115_MV_0P256C);
-            break;
-    }
-}
-//float getMvPerCount();
 
 void triggerConversion(int fd){
     uint16_t trigg;
     uint8_t buff[3];
     trigg = readReg(fd, ADS1115_RA_CONFIG);
     buff[0] = ADS1115_RA_CONFIG;
-    buff[1] = ((trigg >> 8)) & 0xff;
+    buff[1] = ((trigg >> 8) & 0xff;
     buff[1] = buff[1] | (1 << 7);
     buff[2] = ((trigg >> 0) & 0xff);
     writeReg(fd, buff);
 }
 
+int16_t getConversion(int fd){
+    if(getMode(fd)){
+        triggerConversion(fd);
+        pollConversion(fd);
+    }
+    return readReg(fd, ADS1115_RA_CONVERSION);
+}
+
 uint8_t getMultiplexer(int fd){
-    int16_t mux;
+    uint16_t mux;
     //read config 
     mux = readReg(fd, ADS1115_RA_CONFIG);
     //get multiplexer status
     mux = mux >> (ADS1115_CFG_MUX_BIT - ADS1115_CFG_MUX_LENGTH + 1);
     //shift bits, filter out OS bit and return (msB gets cut off)
     mux = mux & 0b0111;
-    return mux;
+    return val;
 }
+
 void setMultiplexer(int fd, uint8_t mux){
     uint16_t config;
     uint8_t buff[3];
@@ -161,12 +79,12 @@ void setMultiplexer(int fd, uint8_t mux){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
-    buff[1] = buff[1] & ~(111 << 4);
-    buff[1] = buff[1] | (mux << 4);
+    buff[1] = buff[1] | (mux << 4);// mux bits are 14, 13,and 12
     buff[2] = ((config >> 0) & 0xff);//bits 7-0 
     //write to multiplexer bits only
     writeReg(fd, buff);
 }
+//needs work
 //sets the gain bits
 void setGain(int fd, uint8_t gain){
     uint16_t config;
@@ -176,7 +94,6 @@ void setGain(int fd, uint8_t gain){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
-    buff[1] = buff[1] & ~(111 << 1);
     buff[1] = buff[1] | (gain << 1);
     buff[2] = ((config >>0) & 0xff);
     //write to gain bits
@@ -184,7 +101,7 @@ void setGain(int fd, uint8_t gain){
 }   
 
 //reads the gain bits
-uint8_t getGain(int fd){
+void getGain(int fd){
     uint16_t gain;
     //read config
     gain = readReg(fd, ADS1115_RA_CONFIG);
@@ -211,7 +128,7 @@ bool getMode(int fd){
     }
 }
 
-void setMode(int fd, uint8_t mode){
+bool setMode(int fd, uint8_t mode){
     uint16_t config;
     uint8_t buff[3];
     //get current config
@@ -219,12 +136,6 @@ void setMode(int fd, uint8_t mode){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
-    if(mode == 1){
-        buff[1] = buff[1] | (mode << 0);
-    }
-    else {
-        buff[1] = buff[1] & (mode << 0);
-    }
     buff[1] = buff[1] | (mode << 0);
     buff[2] = ((config >>0) & 0xff);
     //write to gain bits
@@ -242,7 +153,7 @@ uint8_t getRate(int fd){
     return rate;
 }
 
-void setRate(int fd, uint8_t rate){
+uint8_t setRate(int fd, uint8_t rate){
     uint16_t config;
     uint8_t buff[3];
     //get current config
@@ -250,10 +161,8 @@ void setRate(int fd, uint8_t rate){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
+    buff[1] = buff[1] | (mode << 0);
     buff[2] = ((config >>0) & 0xff);
-    //zero out value and set
-    buff[2] = buff[2] & ~(111 << 5);
-    buff[2] = buff[2] | (rate << 5);
     //write to gain bits
     writeReg(fd, buff);
 }
@@ -282,9 +191,8 @@ void setComparatorMode(int fd, uint8_t mode){
     //mask bits
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
+    buff[1] = buff[1] | (mode << 0);
     buff[2] = ((config >>0) & 0xff);
-    buff[2] = buff[2] & ~(1 << 4);
-    buff[2] = buff[2] | (mode << 4);
     //write to gain bits
     writeReg(fd, buff);
 }
@@ -314,7 +222,6 @@ void setComparatorPolarity(int fd, uint8_t polarity){
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
     buff[2] = ((config >> 0) & 0xff);
-    buff[2] = buff[2] & ~(1 << 3);
     buff[2] = buff[2] | (polarity << 3);
     //write to gain bits
     writeReg(fd, buff);
@@ -345,8 +252,7 @@ void setComparatorLatchEnabled(int fd, uint8_t enabled){
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
     buff[2] = ((config >> 0) & 0xff);
-    buff[2] = buff[2] & ~(1 << 2);
-    buff[2] = buff[2] | (enabled << 2);
+    buff[2] = buff[2] | (enabled << 3);
     //write to gain bits
     writeReg(fd, buff);
 }
@@ -371,12 +277,11 @@ void setComparatorQueueMode(int fd, uint8_t mode){
     buff[0] = ADS1115_RA_CONFIG;
     buff[1] = ((config >> 8) & 0xff);
     buff[2] = ((config >> 0) & 0xff);
-    buff[2] = buff[2] & ~(11 << 0);
     buff[2] = buff[2] | (mode << 0);
     //write to gain bits
     writeReg(fd, buff);
 }
-/*
+
 void beginConversion(int fd){
     uint16_t config;
     uint8_t buff[3];
@@ -390,23 +295,7 @@ void beginConversion(int fd){
     //write to gain bits
     writeReg(fd, buff); 
 }
-*/
-/*
-void setConversionReadyPinMode(int fd, uint8_t pinMode){
-    uint16_t config;
-    uint8_t buff[3];
-    //get current config
-    config = readReg(fd, ADS1115_RA_CONFIG);
-    //mask bits
-    buff[0] = ADS1115_RA_CONFIG;
-    buff[1] = ((config >> 8) & 0xff);
-    buff[2] = ((config >> 0) & 0xff);
-    buff[2] = buff[2] | (pinMode << 0);
-    //write to gain bits
-    writeReg(fd, buff);
-}
-*/
-/*
+
 int16_t getLowThreshold(){
     int16_t lowTheshold;
     //read config
@@ -417,7 +306,6 @@ int16_t getLowThreshold(){
 void setLowThreshold(int fd, int16_t threshold){
 
 }
-
 
 int16_t getHighThreshold(){
     uint16_t highTheshold;
@@ -430,26 +318,21 @@ int16_t getHighThreshold(){
 void setHighThreshold(int16_t threshold){
 
 }
-*/
 
-void writeReg(int fd, uint8_t inputBuf[3]){
-uint8_t buff[3];
-buff[0] = inputBuf[0];
-buff[1] = inputBuf[1];
-buff[2] = inputBuf[2];
-    if (write(fd, buff, 3) != 3) {
+
+int writeReg(int fd, uint8_t inputBuf[3]){
+    if (write(fd, inputBuf, 3) != 3) {
         perror("Write to register 1");
         exit(-1);
     }
-    return;
+    return 1;
 }
 
 
 int16_t readReg(int fd, uint8_t regAddress){
     uint8_t reg[2];
-    reg[0] = regAddress;
     //send slave address byte (write), write to pointer reg
-    if (write(fd, reg, 1) != 1) {
+    if (write(fd, regAddress, 1) != 1) {
         perror("Write register select");
         exit(-1);
     }
@@ -461,5 +344,6 @@ int16_t readReg(int fd, uint8_t regAddress){
     }
     
     //convert dispaly results and return
-    return (reg[0] << 8 | reg[1]);
+    int val = reg[0] << 8 | reg[1];
+    return val;
 }

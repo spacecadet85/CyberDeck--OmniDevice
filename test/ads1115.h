@@ -2,7 +2,6 @@
 #define ADS1115_H
 
 #include <stdint.h>
-#include <stdbool.h>
 
 #define ADS1115_ADDRESS_ADDR_GND    0x48 // address pin low (GND)
 #define ADS1115_ADDRESS_ADDR_VDD    0x49 // address pin high (VCC)
@@ -44,7 +43,6 @@
 #define ADS1115_PGA_2P048           0x02 // default
 #define ADS1115_PGA_1P024           0x03
 #define ADS1115_PGA_0P512           0x04
-
 #define ADS1115_PGA_0P256           0x05
 #define ADS1115_PGA_0P256B          0x06
 #define ADS1115_PGA_0P256C          0x07
@@ -91,7 +89,7 @@
 //ADS1115();
 //ADS1115(uint8_t address);
 
-int initialize_ads1115(int address);
+void initialize(int fd);
 bool testConnection();
 
 // SINGLE SHOT utilities
@@ -101,24 +99,21 @@ void triggerConversion(int fd);
 // Read the current CONVERSION register
 int16_t getConversion(int fd);
 
-/*/ Differential
-int16_t getConversionP0N1(int fd);
-int16_t getConversionP0N3(int fd);
-int16_t getConversionP1N3(int fd);
-int16_t getConversionP2N3(int fd);
+// Differential
+int16_t getConversionP0N1();
+int16_t getConversionP0N3();
+int16_t getConversionP1N3();
+int16_t getConversionP2N3();
 
 // Single-ended
-int16_t getConversionP0GND(int fd);
-int16_t getConversionP1GND(int fd);
-int16_t getConversionP2GND(int fd);
-int16_t getConversionP3GND(int fd);
-*/
-
-
+int16_t getConversionP0GND();
+int16_t getConversionP1GND();
+int16_t getConversionP2GND();
+int16_t getConversionP3GND();
 
 // Utility
-float getMilliVolts(int fd, uint8_t mux);
-//float getMvPerCount();
+float getMilliVolts(int fd, bool triggerAndPoll=true);
+float getMvPerCount(int fd);
 
 // CONFIG register
 bool isConversionReady(int fd);
@@ -127,31 +122,26 @@ void setMultiplexer(int fd, uint8_t mux);
 uint8_t getGain(int fd);
 void setGain(int fd, uint8_t gain);
 bool getMode(int fd);
-void setMode(int fd, uint8_t mode);
+void setMode(int fd, bool mode);
 uint8_t getRate(int fd);
 void setRate(int fd, uint8_t rate);
 bool getComparatorMode(int fd);
-void setComparatorMode(int fd, uint8_t mode);
+void setComparatorMode(int fd, bool mode);
 bool getComparatorPolarity(int fd);
-void setComparatorPolarity(int fd, uint8_t polarity);
+void setComparatorPolarity(int fd, bool polarity);
 bool getComparatorLatchEnabled(int fd);
-void setComparatorLatchEnabled(int fd, uint8_t enabled);
+void setComparatorLatchEnabled(int fd, bool enabled);
 uint8_t getComparatorQueueMode(int fd);
 void setComparatorQueueMode(int fd, uint8_t mode);
-void setConversionReadyPinMode(int fd, uint8_t pinMode);
-
+void setConversionReadyPinMode(int fd);
 
 // *_THRESH registers
-int16_t getLowThreshold();
+int16_t getLowThreshold(int fd);
 void setLowThreshold(int fd, int16_t threshold);
-int16_t getHighThreshold();
-void setHighThreshold(int16_t threshold);
+int16_t getHighThreshold(int fd);
+void setHighThreshold(int fd, int16_t threshold);
 
 // DEBUG
-void showConfigRegister();
-
-void writeReg(int fd, uint8_t inputBuf[3]);
-int16_t readReg(int fd, uint8_t regAddress);
-
+void showConfigRegister(int fd);
 
 #endif
