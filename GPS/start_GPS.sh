@@ -1,6 +1,6 @@
 #!/bin/bash
 
-suod stty -F /dev/ttyS0 38400
+sudo stty -F /dev/ttyS0 9600 
 
 sudo systemctl disable gpsd.socket
 
