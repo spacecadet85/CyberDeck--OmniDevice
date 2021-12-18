@@ -10,7 +10,7 @@
 
 
 //set up comms with ads1115
-void initialize(int fd){
+bool initialize(int fd){
     if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
         printf("Error: Couldn't open device! %d\n", fd);
         exit (1);
