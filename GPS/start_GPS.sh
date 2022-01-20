@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo stty -F /dev/ttyAMA0 38400 
+sudo stty -F /dev/ttyAMA0 38400
 
 #sudo systemctl disable gpsd.socket
 sudo systemctl disable hciuart
