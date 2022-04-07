@@ -20,16 +20,17 @@ ads = ADS.ADS1115(i2c)
 chan = AnalogIn(ads, ADS.P0, ADS.P3)
 voltageDivider = 0.179
 movingAvgBuff = [0,0,0,0,0,0,0,0,0,0]
-coutn = 0
+count = 0
 avg = 0.000
 
-print("{:>5}\t{:>5}\t{:>5}\t{:>5}".format("raw", "v", "bat voltage, moving avg"))
+print("{:>5}\t{:>5}\t{:>5}\t{:>5}".format("raw", "v", "bat voltage","moving avg"))
 
 while True:
     batvoltage = chan.voltage / voltageDivider
     movingAvgBuff[count] = batvoltage
+#    print (movingAvgBuff)
     count = count + 1
-    if count >= 9:
+    if count >= 10:
         avg = sum(movingAvgBuff)/len(movingAvgBuff)
         count = 0
     print("{:>5}\t{:>5.3f}\t{:5.3f}\t{:5.3f}".format(chan.value, chan.voltage, batvoltage, avg))
