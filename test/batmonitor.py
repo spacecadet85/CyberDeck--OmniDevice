@@ -4,6 +4,7 @@
 import time
 import board
 import busio
+import csv
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 
@@ -25,13 +26,20 @@ avg = 0.000
 
 print("{:>5}\t{:>5}\t{:>5}\t{:>5}".format("raw", "v", "bat voltage","moving avg"))
 
+with open('bat.csv', 'w') as f:
+    pass
+
 while True:
     batvoltage = chan.voltage / voltageDivider
     movingAvgBuff[count] = batvoltage
+    output = [chan.value, chan.voltage, batvoltage, avg]
 #    print (movingAvgBuff)
     count = count + 1
     if count >= 10:
         avg = sum(movingAvgBuff)/len(movingAvgBuff)
+        with open('bat.csv', 'a', newline='\n') as f:
+            write = csv.writer(f)
+            write.writerow(output)
         count = 0
     print("{:>5}\t{:>5.3f}\t{:5.3f}\t{:5.3f}".format(chan.value, chan.voltage, batvoltage, avg))
 
