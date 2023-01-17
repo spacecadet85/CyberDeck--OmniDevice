@@ -17,6 +17,7 @@ ads = ADS.ADS1115(i2c)
 
 # Create differential input between channel 0 and 1
 chan = AnalogIn(ads, ADS.P0, ADS.P3)
+
 voltageDivider = 0.180
 lipoVoltage_3s = [9.82, 10.83, 11.06, 11.12, 11.18, 11.24, 11.3, 11.36, 11.39, 11.45, 11.51, 11.56, 11.62, 11.74, 11.86, 11.95, 12.07, 12.25, 12.33, 12.45, 12.6]
 lipoPercent_3s = [0 ,5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
