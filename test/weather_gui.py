@@ -18,7 +18,7 @@ def read_BME280():
     bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, int(bme280_address, 16))
 
     # change this to match the location's pressure (hPa) at sea level
-    bme280.sea_level_pressure = 1008.47
+    bme280.sea_level_pressure = 1030.82
     #bme280.mode = adafruit_bme280.MODE_NORMAL
     #bme280.standby_period = adafruit_bme280.STANDBY_TC_500
     #bme280.iir_filter = adafruit_bme280.IIR_FILTER_X16
@@ -59,7 +59,7 @@ def batt_monitor():
     percent = 0.00
     avg = 0.000
     last_avg = 0.000
-    interval = 1.0
+    interval = 0.5
     delta = 0.1
     state = ""
     print("{:>5}\t{:>5}\t{:>5}".format("voltage", "percent", "state"))
@@ -103,9 +103,9 @@ def batt_monitor():
                 state = "charged"
                 #break
 
-            print("{:>5.3f}\t{:>5.3f}\t{}".format(avg, percent, state))
-            #batvoltagevar.set(avg)
-            #batpercentvar.set(percent)
+        print("{:>5.3f}\t{:>5.3f}\t{}".format(avg, percent, state))
+        batvoltagevar.set('Batt Voltage: {0:.2f} V'.format(avg))
+        batpercentvar.set('Percent: {0:f} %'.format(percent))
 
         time.sleep(interval)
 
