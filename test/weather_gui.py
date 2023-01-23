@@ -105,7 +105,7 @@ def batt_monitor():
 
         print("{:>5.3f}\t{:>5.3f}\t{}".format(avg, percent, state))
         batvoltagevar.set('Batt Voltage: {0:.2f} V'.format(avg))
-        batpercentvar.set('Percent: {0:f} %'.format(percent))
+        batpercentvar.set('Percent: {0:.1f} %'.format(percent))
 
         time.sleep(interval)
 
@@ -144,6 +144,31 @@ pressvar = tk.StringVar()
 altvar = tk.StringVar()
 batvoltagevar = tk.StringVar()
 batpercentvar = tk.StringVar()
+
+# Define Our Images
+#on = PhotoImage(file="on.png")
+#off = PhotoImage(file="off.png")
+
+#button var
+is_on = True
+#button_txt = 'Metric'
+
+#functions
+def switch():
+    global is_on
+
+    # Determine is on or off
+    if is_on:
+        sys_of_msmt_button.config(text= 'Metric')
+        is_on = False
+    else:
+       
+        sys_of_msmt_button.config(text = 'Imperial')
+        is_on = True
+
+#buttons
+sys_of_msmt_button = ttk.Button(root, text='Metric', command=switch)
+sys_of_msmt_button.pack(in_=frame2, ipadx=10)
 
 templabel = tk.Label(notebook, textvariable= tempvar)
 templabel.pack(in_=frame2, expand=True, ipadx=10)
