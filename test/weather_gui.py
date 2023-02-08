@@ -31,10 +31,22 @@ def read_BME280():
         temperature = bme280.temperature
         pressure = bme280.pressure
         altitude = bme280.altitude
+        temp_des = "C"
+        press_des = "hPa"
+        alt_des = "meters"
 
-        tempvar.set('Temperature: {0:.1f} C'.format(temperature))
-        pressvar.set('Pressure: {0:.2f} hPa'.format(pressure))
-        altvar.set('Altitude: {0:.2f} meters'.format(altitude))
+        #convert to imperial on false
+        if is_on == False:
+            temperature = temperature * 9/5+32
+            pressure = pressure * 1/33.863886666667
+            altitude = altitude * 3.28084
+            temp_des = "F"
+            press_des = "inHg"
+            alt_des = "ft"
+
+        tempvar.set('Temperature: {0:.1f} {1}'.format(temperature, temp_des))
+        pressvar.set('Pressure: {0:.2f} {1}'.format(pressure, press_des))
+        altvar.set('Altitude: {0:.2f} {1}'.format(altitude, alt_des))   
 
         print("\nTemperature: %0.1f C" % temperature)
         print("Pressure: %0.1f hPa" % pressure)
@@ -184,10 +196,6 @@ voltlabel.pack(in_=frame3, expand=True, ipadx=10)
 
 perclabel = tk.Label(notebook, textvariable=batpercentvar)
 perclabel.pack(in_=frame3, expand=True, ipadx=10)
-#ttk.Label(frame2, textvariable= pressvar)
-#ttk.Label(frame2, textvariable= altvar)
-#ttk.Label(frame3, textvariable= batvoltagevar)
-#ttk.Label(frame3, textvariable= batpercentvar)
 
 #start threads
 BME280_Handler.start()
