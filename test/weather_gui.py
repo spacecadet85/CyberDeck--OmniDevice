@@ -10,6 +10,9 @@ from adafruit_ads1x15.analog_in import AnalogIn
 import busio
 import csv
 
+is_on = True
+logger_is_on = False
+
 #this space for sensor daemon----------------------
 def read_BME280():
     # Create sensor object, communicating over the board's default I2C bus
@@ -66,7 +69,7 @@ def batt_monitor():
     voltageDivider = 0.180
     lipoVoltage_3s = [9.82, 10.83, 11.06, 11.12, 11.18, 11.24, 11.3, 11.36, 11.39, 11.45, 11.51, 11.56, 11.62, 11.74, 11.86, 11.95, 12.07, 12.25, 12.33, 12.45, 12.6]
     lipoPercent_3s = [0 ,5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
-    movingAvgBuff = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]
+    movingAvgBuff = [0,0,0,0,0,0,0,0,0,0]
     count = 0
     percent = 0.00
     avg = 0.000
@@ -74,49 +77,47 @@ def batt_monitor():
     interval = 0.5
     delta = 0.1
     state = ""
-    print("{:>5}\t{:>5}\t{:>5}".format("voltage", "percent", "state"))
+    file_toggle = True
+    fileheader = ['Time','Voltage']
+    
 
     #with open('bat.csv', 'w') as f:
         #pass
 
+    def get_avg():
+        count = 0
+        movingAvgBuff = [0,0,0,0,0,0,0,0,0,0]
+        while count > 10:
+            movingAvgBuff[count] = chan.voltage / voltageDivider
+            count = count + 1
+        return sum(movingAvgBuff)/len(movingAvgBuff)
+
     while True:
-        batvoltage = chan.voltage / voltageDivider
-        movingAvgBuff[count] = batvoltage
-        output = [chan.value, chan.voltage, batvoltage, avg]
-        #print (movingAvgBuff)
-        count = count + 1
-        if count >= 20:
+        batvoltage = get_avg()
+        seconds = time.time()
+        output = [seconds, batvoltage]
 
-            #calc average voltage
-            avg = sum(movingAvgBuff)/len(movingAvgBuff)
-            #with open('bat.csv', 'a', newline='\n') as f:
-                #write = csv.writer(f)
-                #write.writerow(output)
-            count = 0
-            #determine percentage using linear interpolation
-            #find indexes
-            for i in range(len(lipoVoltage_3s)-1):
-                if lipoVoltage_3s[i] <= avg and lipoVoltage_3s[i+1] > avg:
-                    percent = lipoPercent_3s[i]+(avg-lipoVoltage_3s[i])*(lipoPercent_3s[i+1]-lipoPercent_3s[i])/(lipoVoltage_3s[i+1]-lipoVoltage_3s[i])
+        for i in range(len(lipoVoltage_3s)-1):
+            if lipoVoltage_3s[i] <= batvoltage and lipoVoltage_3s[i+1] > batvoltage:
+                percent = lipoPercent_3s[i]+(avg-lipoVoltage_3s[i])*(lipoPercent_3s[i+1]-lipoPercent_3s[i])/(lipoVoltage_3s[i+1]-lipoVoltage_3s[i])
+        
+        #file logger if button is turned on 
+        if logger_is_on:
+            if file_toggle:
+                with open('battery.csv', 'w') as file:
+                    writer = csv.write(file)
+                    writer.writerow(fileheader)
+                file_toggle = False
 
-            #determine the charge state (charge, discarge, charge complete)
-            #if moving average increases greater than delta 
-            if abs(last_avg - avg) > delta and avg > last_avg:
-                state = "charging"
-                last_avg = avg
-                #break
-            #if moving average decrease more than delta then discharge
-            elif abs(last_avg - avg) > delta and avg < last_avg:
-                state = "discharging"
-                last_avg = avg
-                #break
-            elif avg > 12.6:
-            #if greater thatn 12.6 volts 
-                state = "charged"
-                #break
+            log = [time.time(), batvoltage]
+            with open('battery.csv', 'w', newline='') as file:
+                writer = csv.write(file)
+                writer.writerow(output)
 
-        print("{:>5.3f}\t{:>5.3f}\t{}".format(avg, percent, state))
-        batvoltagevar.set('Batt Voltage: {0:.2f} V'.format(avg))
+
+        print("{:>5}\t{:>5}".format("battery Volts", "percent"))        
+        print("{:>5.3f}\t{:>5.3f}".format(batvoltage, percent))
+        batvoltagevar.set('Batt Voltage: {0:.2f} V'.format(batvoltage))
         batpercentvar.set('Percent: {0:.1f} %'.format(percent))
 
         time.sleep(interval)
@@ -162,7 +163,7 @@ batpercentvar = tk.StringVar()
 #off = PhotoImage(file="off.png")
 
 #button var
-is_on = True
+
 #button_txt = 'Metric'
 
 #functions
@@ -178,10 +179,26 @@ def switch():
         sys_of_msmt_button.config(text = 'Imperial')
         is_on = True
 
+def v_logger_switch():
+    global logger_is_on
+
+    # Determine is on or off
+    if logger_is_on:
+        v_logger_button.config(text= 'On')
+        logger_is_on = False
+    else:
+       
+        v_logger_button.config(text = 'Off')
+        logger_is_on = True
+
 #buttons
 sys_of_msmt_button = ttk.Button(root, text='Metric', command=switch)
 sys_of_msmt_button.pack(in_=frame2, ipadx=10)
 
+v_logger_button = ttk.Button(root, text='Off', command=v_logger_switch)
+v_logger_button.pack(in_=frame3, ipadx=10)
+
+#labels
 templabel = tk.Label(notebook, textvariable= tempvar)
 templabel.pack(in_=frame2, expand=True, ipadx=10)
 
